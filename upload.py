@@ -68,10 +68,6 @@ async def merge_meta(meta, saved_meta, path):
 
 async def process_meta(meta, base_dir):
     """Process the metadata for each queued path."""
-
-    async def process_meta(meta, base_dir):
-    """Process the metadata for each queued path."""
-
     if meta['imghost'] is None:
         meta['imghost'] = config['DEFAULT']['img_host_1']
 
@@ -92,44 +88,44 @@ async def process_meta(meta, base_dir):
     meta['base_dir'] = base_dir
     prep = Prep(screens=meta['screens'], img_host=meta['imghost'], config=config)
     meta = await prep.gather_prep(meta=meta, mode='cli')
-    
+
     if not meta:
         return
     else:
         meta['cutoff'] = int(config['DEFAULT'].get('cutoff_screens', 3))
-        if len(meta.get('image_list', [])) < meta.get('cutoff') and meta.get('skip_imghost_upload', False) is False:
-            if 'image_list' not in meta:
-                meta['image_list'] = []
-            return_dict = {}
-            new_images, dummy_var = upload_screens(meta, meta['screens'], 1, 0, meta['screens'], [], return_dict=return_dict)
-
-        elif meta.get('skip_imghost_upload', False) is True and meta.get('image_list', False) is False:
+    if len(meta.get('image_list', [])) < meta.get('cutoff') and meta.get('skip_imghost_upload', False) is False:
+        if 'image_list' not in meta:
             meta['image_list'] = []
+        return_dict = {}
+        new_images, dummy_var = upload_screens(meta, meta['screens'], 1, 0, meta['screens'], [], return_dict=return_dict)
 
-        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/meta.json", 'w') as f:
-            json.dump(meta, f, indent=4)
+    elif meta.get('skip_imghost_upload', False) is True and meta.get('image_list', False) is False:
+        meta['image_list'] = []
 
-        torrent_path = os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-        if not os.path.exists(torrent_path):
-            reuse_torrent = None
-            if meta.get('rehash', False) is False:
-                reuse_torrent = await client.find_existing_torrent(meta)
-                if reuse_torrent is not None:
-                    await create_base_from_existing_torrent(reuse_torrent, meta['base_dir'], meta['uuid'])
+    with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/meta.json", 'w') as f:
+        json.dump(meta, f, indent=4)
 
-            if meta['nohash'] is False and reuse_torrent is None:
-                create_torrent(meta, Path(meta['path']), "BASE")
-            if meta['nohash']:
-                meta['client'] = "none"
+    torrent_path = os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
+    if not os.path.exists(torrent_path):
+        reuse_torrent = None
+        if meta.get('rehash', False) is False:
+            reuse_torrent = await client.find_existing_torrent(meta)
+            if reuse_torrent is not None:
+                await create_base_from_existing_torrent(reuse_torrent, meta['base_dir'], meta['uuid'])
 
-        elif os.path.exists(torrent_path) and meta.get('rehash', False) is True and meta['nohash'] is False:
+        if meta['nohash'] is False and reuse_torrent is None:
             create_torrent(meta, Path(meta['path']), "BASE")
+        if meta['nohash']:
+            meta['client'] = "none"
 
-        if int(meta.get('randomized', 0)) >= 1:
-            create_random_torrents(meta['base_dir'], meta['uuid'], meta['randomized'], meta['path'])
+    elif os.path.exists(torrent_path) and meta.get('rehash', False) is True and meta['nohash'] is False:
+        create_torrent(meta, Path(meta['path']), "BASE")
 
-        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/meta.json", 'w') as f:
-            json.dump(meta, f, indent=4)
+    if int(meta.get('randomized', 0)) >= 1:
+        create_random_torrents(meta['base_dir'], meta['uuid'], meta['randomized'], meta['path'])
+
+    with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/meta.json", 'w') as f:
+        json.dump(meta, f, indent=4)
 
 
 async def get_log_file(base_dir, queue_name):
