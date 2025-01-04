@@ -67,7 +67,6 @@ async def merge_meta(meta, saved_meta, path):
 
 
 async def process_meta(meta, base_dir):
-    auto_mode = False
     if meta['imghost'] is None:
         meta['imghost'] = config['DEFAULT']['img_host_1']
 
