@@ -69,17 +69,30 @@ async def merge_meta(meta, saved_meta, path):
 async def process_meta(meta, base_dir):
     """Process the metadata for each queued path."""
 
+    async def process_meta(meta, base_dir):
+    """Process the metadata for each queued path."""
+
     if meta['imghost'] is None:
         meta['imghost'] = config['DEFAULT']['img_host_1']
 
-    if not meta['unattended']:
-        ua = config['DEFAULT'].get('auto_mode', False)
-        if str(ua).lower() == "true":
-            meta['unattended'] = True
-            console.print("[yellow]Running in Auto Mode")
+    # Check if --auto-mode was passed
+    if meta.get('auto_mode') is True:
+        # Force auto_mode for this run
+        meta['unattended'] = True
+        console.print("[yellow]Overriding auto_mode to True from CLI (--auto-mode).")
+    else:
+        # Only if --auto-mode was NOT used, fall back to config's auto_mode
+        if not meta['unattended']:
+            ua = config['DEFAULT'].get('auto_mode', False)
+            if str(ua).lower() == "true":
+                meta['unattended'] = True
+                console.print("[yellow]Running in Auto Mode (from config)")
+
+    # Now meta['unattended'] is set properly
     meta['base_dir'] = base_dir
     prep = Prep(screens=meta['screens'], img_host=meta['imghost'], config=config)
     meta = await prep.gather_prep(meta=meta, mode='cli')
+    
     if not meta:
         return
     else:
