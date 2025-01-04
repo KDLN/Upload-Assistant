@@ -68,6 +68,10 @@ async def merge_meta(meta, saved_meta, path):
 
 async def process_meta(meta, base_dir):
     """Process the metadata for each queued path."""
+    print("===============================================================================================")
+    print(type(meta.get('auto_mode')))
+    print(meta)
+    print("===============================================================================================")
     if meta['imghost'] is None:
         meta['imghost'] = config['DEFAULT']['img_host_1']
 
