@@ -101,6 +101,8 @@ class Args():
         parser.add_argument('-fl', '--freeleech', nargs='*', required=False, help="Freeleech Percentage", default=0, dest="freeleech")
         parser.add_argument('--infohash', nargs='*', required=False, help="V1 Info Hash")
         parser.add_argument('-am','--auto-mode', action= 'store_true', required=False, help="Override config's auto_mode to True for this upload")
+        #parser.add_arument('--nuke-extra, action='store_true', required=False, help="Nuke extra torrents files(Non .MKV or .MP4)") 
+        parser.add_argument('-print-path', '--print-path', action='store_true', required=False, help="Print the path of the file")
         args, before_args = parser.parse_known_args(input)
         args = vars(args)
         # console.print(args)
