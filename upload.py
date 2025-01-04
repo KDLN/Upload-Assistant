@@ -127,9 +127,6 @@ async def process_meta(meta, base_dir):
     with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/meta.json", 'w') as f:
         json.dump(meta, f, indent=4)
 
-    print(f"Processed {meta['path']}")
-
-
 async def get_log_file(base_dir, queue_name):
     """
     Returns the path to the log file for the given base directory and queue name.
